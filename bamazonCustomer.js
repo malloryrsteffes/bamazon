@@ -15,3 +15,19 @@ var connection = mysql.createConnection({
   password: "root1234",
   database: "bamazonDB"
 });
+
+//start function
+function start(){
+    console.log("Loading all products...");
+    connection.query("SELECT * FROM products", function(err, res) {
+        if (err) throw err;
+        // Log all results' ids, names and prices
+        for (i = 0; i < res.length; i++){
+            console.log(res[i].item_id + " | Product: " 
+            + res[i].product_name + " | $" + res[i].price);
+        }
+        connection.end();
+      });
+}
+
+start();
