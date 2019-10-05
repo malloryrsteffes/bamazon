@@ -64,6 +64,7 @@ function managerStart() {
 // View Products
 
 function viewProducts() {
+
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         // Log all results' ids, names and prices
@@ -75,6 +76,7 @@ function viewProducts() {
 
 // View products with low inventory. Order by lowest first
 function viewLowInventory() {
+
     connection.query("SELECT * FROM products WHERE (stock_quantity < 2000) ORDER BY stock_quantity ASC", function (err, res) {
         if (err) throw err;
         // Log all results' ids, names and prices
@@ -86,6 +88,7 @@ function viewLowInventory() {
 
 function addToInventory() {
 
+    // Pull up all items so manager can see
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         // Log all results' ids, names and prices
@@ -115,4 +118,31 @@ function addToInventory() {
                 })
             })
     })
+}
+
+function newProduct(){
+    inquirer.prompt([{
+        name: "action",
+        type: "input",
+        message: "Please enter the name of the item.",
+    },
+    {
+        name: "department",
+        type: "input",
+        message: "Please enter the department for this item."
+    },
+    {
+        name: "price",
+        type: "input",
+        message: "Please enter the price of this item."
+    },
+    {
+        name: "stock",
+        type: "input",
+        message: "Please enter the starting stock for this item."
+    },
+        ])
+        .then(function (answer) {
+            
+        })
 }
