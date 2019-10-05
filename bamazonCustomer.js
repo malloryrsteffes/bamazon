@@ -19,12 +19,14 @@ var connection = mysql.createConnection({
 //start function
 function start() {
   console.log("Loading all products...");
+
+  // Grab all items from the bamazon db
   connection.query("SELECT item_id, product_name, price FROM products", function (err, res) {
     if (err) throw err;
     // Log all results' ids, names and prices
     console.table(res);
 
-
+    // Prompt the customer for what item they'd like to buy (and the quantity)
     inquirer.prompt([{
       name: "IDSearch",
       type: "input",
@@ -36,19 +38,24 @@ function start() {
       message: "Please enter how many you would like to purchase."
     }])
       .then(function (answer) {
+
         var idAnswer = answer.IDSearch;
         var quantity = answer.quantity
+
+        // Grab the item that matches the requested ID 
         connection.query("SELECT item_id, product_name, price, stock_quantity FROM products WHERE item_id =?",
           [idAnswer], function (err, res) {
             if (err) throw err;
 
-            // If the requested amount is less than what we have in stock
+            // If the requested quantity is less than what we have in stock
             if (quantity < res[0].stock_quantity) {
+              
               var updatedStock = res[0].stock_quantity - quantity;
               connection.query("UPDATE products SET stock_quantity=? WHERE item_id= ?", [updatedStock, idAnswer])
                 
                 console.log("Your purchase was successful! Your order total is $" + (quantity * res[0].price));
             }
+
             // If we don't have enough product to sell.
             else {
               console.log("Sorry! We are short-stocked on this item. We currently have " + res[0].stock_quantity + " available!");
