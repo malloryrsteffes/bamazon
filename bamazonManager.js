@@ -72,3 +72,14 @@ function managerStart() {
         managerStart();
         })
     }
+
+    // View products with low inventory. Order by lowest first
+    function viewLowInventory(){
+        connection.query("SELECT * FROM products WHERE (stock_quantity < 2000) ORDER BY stock_quantity ASC", function (err, res) {
+            if (err) throw err;
+            // Log all results' ids, names and prices
+            console.log("Pulling up low-inventory prodcuts now...");
+            console.table(res);
+            managerStart();
+            })
+    }
