@@ -61,8 +61,7 @@ function managerStart() {
         });
 }
 
-// View Products
-
+// VIEW PRODUCTS ===================================================
 function viewProducts() {
 
     connection.query("SELECT * FROM products", function (err, res) {
@@ -74,9 +73,9 @@ function viewProducts() {
     })
 }
 
-// View products with low inventory. Order by lowest first
+// VIEW LOW INVENTORY ===================================================
 function viewLowInventory() {
-
+    // Order by lowest first
     connection.query("SELECT * FROM products WHERE (stock_quantity < 2000) ORDER BY stock_quantity ASC", function (err, res) {
         if (err) throw err;
         // Log all results' ids, names and prices
@@ -86,6 +85,7 @@ function viewLowInventory() {
     })
 }
 
+// ADD INVENTORY ===================================================
 function addToInventory() {
 
     // Pull up all items so manager can see
@@ -110,25 +110,28 @@ function addToInventory() {
                 var idAnswer = answer.action;
                 var updatedStock = answer.quantity + res[0].stock_quantity;
 
-                // Not working yet. Can't get the updatedStock to add to the currently existing stock.
                 connection.query("UPDATE products SET ? WHERE ?",
-                [
-                  {
-                    stock_quantity: updatedStock 
-                  },
-                  {
-                    item_id: idAnswer
-                  }
-                ], function (err, res) {
-                    if (err) throw err;
-                    console.log("New inventory added!");
-                    console.table(res);
-                })
+                    [
+                        {
+                            stock_quantity: updatedStock
+                        },
+                        {
+                            item_id: idAnswer
+                        }
+                    ], function (err, res) {
+                        if (err) throw err;
+                        console.log("New inventory added!");
+                        console.table(res);
+                        managerStart();
+
+                    })
             })
+
     })
 }
 
-function newProduct(){
+// ADD NEW PRODUCT ===================================================
+function newProduct() {
     inquirer.prompt([{
         name: "action",
         type: "input",
@@ -149,8 +152,23 @@ function newProduct(){
         type: "input",
         message: "Please enter the starting stock for this item."
     },
-        ])
+    ])
         .then(function (answer) {
-            
+            console.log("Inserting a new product...\n");
+            var query = connection.query(
+                "INSERT INTO products SET ?",
+                {
+                    product_name: answer.action,
+                    department_name: answer.department,
+                    price: answer.price,
+                    stock_quantity: answer.stock
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    console.log(res.affectedRows + " product inserted!\n");
+                    managerStart();
+
+                }
+            )
         })
 }
