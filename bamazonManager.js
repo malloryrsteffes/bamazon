@@ -103,15 +103,23 @@ function addToInventory() {
         },
         {
             name: "quantity",
-            type: "input",
+            type: "number",
             message: "How many units are you adding?"
         }])
             .then(function (answer) {
                 var idAnswer = answer.action;
-                var updatedStock = answer.quantity;
+                var updatedStock = answer.quantity + res[0].stock_quantity;
 
                 // Not working yet. Can't get the updatedStock to add to the currently existing stock.
-                connection.query("UPDATE products SET stock_quantity=? WHERE item_id=?", [updatedStock, idAnswer], function (err, res) {
+                connection.query("UPDATE products SET ? WHERE ?",
+                [
+                  {
+                    stock_quantity: updatedStock 
+                  },
+                  {
+                    item_id: idAnswer
+                  }
+                ], function (err, res) {
                     if (err) throw err;
                     console.log("New inventory added!");
                     console.table(res);
